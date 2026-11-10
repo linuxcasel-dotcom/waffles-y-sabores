@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Sistema de demostración de ventas de Waffles y Sabores S.A.C. Incluye registro de pedidos, productos, inventario e informes.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Waffles y Sabores S.A.C. | Sistema de ventas">
+<meta property="og:description" content="Demostración académica de un sistema web de ventas para Waffles y Sabores S.A.C.">
+
+<meta name="theme-color" content="#8b4513">
+<title>Waffles y Sabores S.A.C. | Sistema de ventas</title>
+<style>
+:root{--brown:#6f3d20;--brown2:#8b4513;--gold:#e6a23c;--cream:#fff8ed;--ink:#30251f;--muted:#776b63;--line:#eadfd3;--green:#287a4b;--red:#b83b35;--panel:#fff}
+*{box-sizing:border-box}body{margin:0;background:#f7f2ec;color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(115deg,#593018,#8b4513);color:#fff;padding:18px max(16px,calc((100vw - 1200px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:#fff2df;color:#6f3d20;display:grid;place-items:center;font-size:25px}.brand h1{font-size:20px;margin:0}.brand p{margin:2px 0 0;color:#f5dfc8;font-size:12px}
+header .date{font-size:12px;color:#f5dfc8}
+nav{display:flex;gap:7px;overflow:auto;padding:12px max(12px,calc((100vw - 1200px)/2));background:#fff;border-bottom:1px solid var(--line)}
+nav button{white-space:nowrap;border:0;background:transparent;color:var(--muted);padding:10px 14px;border-radius:10px;font-weight:650;cursor:pointer}
+nav button.active,nav button:hover{background:#f5e8d8;color:var(--brown)}
+main{max-width:1200px;margin:22px auto;padding:0 16px 50px}.page{display:none}.page.active{display:block}
+h2{font-size:22px;margin:0 0 16px}h3{font-size:16px;margin:0 0 12px}
+.grid{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:18px}.two{grid-template-columns:1.2fr .8fr}.three{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 3px 12px #51331b08;min-width:0}
+.stat-label{font-size:12px;color:var(--muted)}.stat-value{font-size:25px;font-weight:800;margin-top:5px}.stat-icon{float:right;font-size:21px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.between{justify-content:space-between}
+button,.button{font:inherit;cursor:pointer}.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;background:var(--brown);color:white}.btn:hover{filter:brightness(1.08)}.btn.gold{background:var(--gold);color:#39230e}.btn.light{background:#f4e9dc;color:var(--brown)}.btn.danger{background:#fbe8e6;color:var(--red)}.btn.small{padding:6px 9px;font-size:12px}
+input,select{font:inherit;border:1px solid #d9cbbd;border-radius:9px;padding:10px;background:#fff;color:var(--ink);width:100%;min-width:0}
+label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:0 0 5px}.field{min-width:0}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.products{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.product{border:1px solid var(--line);border-radius:13px;padding:12px;background:#fff;display:flex;flex-direction:column;gap:7px}.product .emoji{font-size:26px}.product strong{font-size:14px}.product small{color:var(--muted)}.product .price{font-weight:800;color:var(--brown)}
+.cartline{display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:10px 0}.cartline:last-child{border:0}.qty{display:flex;align-items:center;gap:7px}.qty button{border:1px solid var(--line);background:#fff;border-radius:7px;width:27px;height:27px}
+.total{font-size:24px;font-weight:850;color:var(--brown)}.muted{color:var(--muted)}.empty{padding:24px;text-align:center;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:11px;text-transform:uppercase}td:last-child,th:last-child{text-align:right}.tablewrap{overflow:auto}
+.tag{display:inline-block;padding:4px 8px;border-radius:30px;background:#e8f4ec;color:var(--green);font-size:11px;font-weight:700}.tag.low{background:#fbe8e6;color:var(--red)}
+.notice{background:#fff5df;border:1px solid #f0d69e;color:#765019;border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:14px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.search{max-width:260px}.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:20px}
+@media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.products{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){main{padding:0 11px 35px;margin-top:15px}.card{padding:13px}.products{grid-template-columns:1fr 1fr}.product{padding:10px}.stat-value{font-size:21px}.fields{grid-template-columns:1fr}.brand h1{font-size:17px}}
+@media print{header,nav,.no-print,footer{display:none!important}body{background:#fff}.page{display:none!important}#receiptPrint{display:block!important}main{margin:0;padding:0}.card{box-shadow:none;border:0}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">🧇</div><div><h1>WAFFLES Y SABORES S.A.C.</h1><p>Sistema local de ventas y control del negocio</p></div></div>
+ <div class="date" id="today"></div>
+</header>
+<nav class="no-print">
+ <button class="active" data-page="dashboard">📊 Resumen</button>
+ <button data-page="sales">🛒 Nueva venta</button>
+ <button data-page="history">🧾 Historial</button>
+ <button data-page="products">🧇 Productos</button>
+ <button data-page="inventory">📦 Inventario</button>
+ <button data-page="reports">📈 Reportes</button>
+ <button data-page="settings">⚙️ Copias y ajustes</button>
+</nav>
+<main>
+<section class="page active" id="dashboard">
+ <div class="sectionhead"><h2>Resumen del negocio</h2><span class="muted" id="dashDate"></span></div>
+ <div class="grid stats">
+  <div class="card"><span class="stat-icon">💰</span><div class="stat-label">Ventas de hoy</div><div class="stat-value" id="todaySales">S/ 0.00</div></div>
+  <div class="card"><span class="stat-icon">🧾</span><div class="stat-label">Pedidos de hoy</div><div class="stat-value" id="todayOrders">0</div></div>
+  <div class="card"><span class="stat-icon">📅</span><div class="stat-label">Ventas acumuladas</div><div class="stat-value" id="allSales">S/ 0.00</div></div>
+  <div class="card"><span class="stat-icon">🧇</span><div class="stat-label">Productos registrados</div><div class="stat-value" id="productCount">0</div></div>
+ </div>
+ <div class="grid two">
+  <div class="card"><h3>Últimas ventas</h3><div class="tablewrap"><table><thead><tr><th>Fecha</th><th>Pedido</th><th>Pago</th><th>Total</th></tr></thead><tbody id="recentSales"></tbody></table></div></div>
+  <div class="card"><h3>Alertas de inventario</h3><div id="stockAlerts"></div></div>
+ </div>
+</section>
+
+<section class="page" id="sales">
+ <h2>Registrar nueva venta</h2>
+ <div class="notice">Selecciona los productos para agregarlos al pedido. El stock se descontará al confirmar la venta. Los productos y precios iniciales son ejemplos editables.</div>
+ <div class="grid two">
+  <div class="card">
+   <div class="sectionhead"><h3>Menú de productos</h3><input class="search" id="productSearch" placeholder="Buscar producto..."></div>
+   <div class="products" id="saleProducts"></div>
+  </div>
+  <div class="card">
+   <h3>Pedido actual</h3>
+   <div class="fields">
+    <div class="field"><label for="customer">Cliente (opcional)</label><input id="customer" placeholder="Nombre del cliente"></div>
+    <div class="field"><label for="payment">Método de pago</label><select id="payment"><option>Efectivo</option><option>Yape</option><option>Plin</option><option>Tarjeta</option><option>Otro</option></select></div>
+   </div>
+   <div id="cart"><div class="empty">Aún no hay productos en el pedido.</div></div>
+   <div class="row between" style="margin-top:12px"><span class="muted">Total a pagar</span><span class="total" id="cartTotal">S/ 0.00</span></div>
+   <div class="actions no-print" style="margin-top:14px"><button class="btn" id="completeSale">Confirmar venta</button><button class="btn light" id="clearCart">Vaciar pedido</button></div>
+  </div>
+ </div>
+</section>
+
+<section class="page" id="history">
+ <div class="sectionhead"><h2>Historial de ventas</h2><input id="historySearch" class="search" placeholder="Buscar por cliente o código..."></div>
+ <div class="card tablewrap"><table><thead><tr><th>Código / Fecha</th><th>Cliente</th><th>Productos</th><th>Pago</th><th>Total</th><th class="no-print">Acción</th></tr></thead><tbody id="historyRows"></tbody></table></div>
+</section>
+
+<section class="page" id="products">
+ <div class="sectionhead"><h2>Administrar productos</h2><button class="btn" id="newProduct">＋ Agregar producto</button></div>
+ <div class="card">
+  <div class="tablewrap"><table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="productRows"></tbody></table></div>
+ </div>
+</section>
+
+<section class="page" id="inventory">
+ <h2>Control de inventario</h2>
+ <div class="notice">Este prototipo controla unidades disponibles por producto. No calcula todavía el consumo de ingredientes de cada receta.</div>
+ <div class="card tablewrap"><table><thead><tr><th>Producto</th><th>Stock disponible</th><th>Actualizar stock</th><th>Estado</th></tr></thead><tbody id="inventoryRows"></tbody></table></div>
+</section>
+
+<section class="page" id="reports">
+ <h2>Reportes de ventas</h2>
+ <div class="card">
+  <div class="fields" style="max-width:500px;margin-bottom:14px">
+   <div><label for="fromDate">Desde</label><input type="date" id="fromDate"></div>
+   <div><label for="toDate">Hasta</label><input type="date" id="toDate"></div>
+  </div>
+  <div class="actions no-print"><button class="btn" id="runReport">Generar reporte</button><button class="btn light" id="exportCsv">Exportar CSV</button></div>
+  <div class="grid stats" style="margin-top:16px">
+   <div class="card"><div class="stat-label">Ventas del periodo</div><div class="stat-value" id="periodTotal">S/ 0.00</div></div>
+   <div class="card"><div class="stat-label">Pedidos</div><div class="stat-value" id="periodOrders">0</div></div>
+   <div class="card"><div class="stat-label">Unidades vendidas</div><div class="stat-value" id="periodUnits">0</div></div>
+   <div class="card"><div class="stat-label">Promedio por pedido</div><div class="stat-value" id="periodAverage">S/ 0.00</div></div>
+  </div>
+  <div class="tablewrap"><table><thead><tr><th>Fecha</th><th>Pedidos</th><th>Total vendido</th></tr></thead><tbody id="reportRows"></tbody></table></div>
+ </div>
+</section>
+
+<section class="page" id="settings">
+ <h2>Copias de seguridad y ajustes</h2>
+ <div class="grid two">
+  <div class="card">
+   <h3>Respaldo de información</h3>
+   <p class="muted">Tus datos se guardan en el almacenamiento local del navegador. Descarga una copia periódicamente para evitar perderlos.</p>
+   <div class="actions"><button class="btn" id="backup">Descargar copia JSON</button><label class="btn light" style="display:inline-block;margin:0">Restaurar copia<input id="restoreFile" type="file" accept=".json,application/json" hidden></label></div>
+  </div>
+  <div class="card">
+   <h3>Datos del negocio</h3>
+   <div class="field"><label for="businessName">Nombre comercial</label><input id="businessName" value="WAFFLES Y SABORES S.A.C."></div>
+   <div class="field" style="margin-top:10px"><label for="businessAddress">Dirección / ubicación</label><input id="businessAddress" value="Íllimo, Lambayeque"></div>
+   <button class="btn" id="saveSettings" style="margin-top:12px">Guardar datos</button>
+  </div>
+ </div>
+ <div class="card" style="margin-top:14px"><h3>Importante</h3><p class="muted">La aplicación funciona sin internet y no envía información a servidores. Los datos permanecen en el navegador y dispositivo donde se registraron. Para usarla en varios dispositivos, exporta e importa copias manualmente; no hay sincronización automática.</p><button class="btn danger" id="resetData">Restablecer datos de demostración</button></div>
+</section>
+
+<section class="page" id="receiptPrint">
+ <div id="receiptContent"></div>
+</section>
+</main>
+<footer>WAFFLES Y SABORES S.A.C. · Sistema de demostración local · Verifica y personaliza los precios antes de usarlo.</footer>
+
+<script>
+"use strict";
+const KEY="wyS_sales_system_v1";
+const seedProducts=[
+ {id:1,name:"Waffle con loche",price:8,stock:30,emoji:"🎃"},
+ {id:2,name:"Waffle con frutas",price:7,stock:30,emoji:"🍓"},
+ {id:3,name:"Waffle con chocolate",price:9,stock:30,emoji:"🍫"},
+ {id:4,name:"Waffle clásico",price:6,stock:30,emoji:"🧇"},
+ {id:5,name:"Waffle especial",price:10,stock:20,emoji:"🍯"}
+];
+let state=loadState(),cart=[],lastReceipt=null;
+function loadState(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.products)&&Array.isArray(x.sales))return x}catch(e){}return {products:seedProducts.map(p=>({...p})),sales:[],settings:{name:"WAFFLES Y SABORES S.A.C.",address:"Íllimo, Lambayeque"},nextSale:1,nextProduct:6}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
+function money(n){return "S/ "+Number(n||0).toFixed(2)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function dateKey(d=new Date()){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function fmtDate(s){return new Date(s).toLocaleString("es-PE",{dateStyle:"short",timeStyle:"short"})}
+function nav(page){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(page).classList.add("active");document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));if(page==="receiptPrint")return}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>nav(b.dataset.page)));
+function renderAll(){renderDashboard();renderSaleProducts();renderCart();renderHistory();renderProducts();renderInventory();document.getElementById("businessName").value=state.settings.name;document.getElementById("businessAddress").value=state.settings.address}
+function renderDashboard(){
+ const today=dateKey(),ts=state.sales.filter(s=>dateKey(new Date(s.date))===today),sum=arr=>arr.reduce((a,b)=>a+b.total,0);
+ document.getElementById("todaySales").textContent=money(sum(ts));document.getElementById("todayOrders").textContent=ts.length;
+ document.getElementById("allSales").textContent=money(sum(state.sales));document.getElementById("productCount").textContent=state.products.length;
+ document.getElementById("dashDate").textContent=new Date().toLocaleDateString("es-PE",{dateStyle:"full"});
+ document.getElementById("recentSales").innerHTML=state.sales.slice().reverse().slice(0,6).map(s=>`<tr><td>${fmtDate(s.date)}</td><td>${esc(s.code)}</td><td>${esc(s.payment)}</td><td>${money(s.total)}</td></tr>`).join("")||'<tr><td colspan="4" class="empty">Todavía no hay ventas.</td></tr>';
+ const low=state.products.filter(p=>p.stock<=5);document.getElementById("stockAlerts").innerHTML=low.length?low.map(p=>`<p>⚠️ <b>${esc(p.name)}</b>: quedan ${p.stock} unidades</p>`).join(""):'<p class="muted">No hay alertas de stock bajo.</p>';
+}
+function renderSaleProducts(){
+ const q=(document.getElementById("productSearch")?.value||"").toLowerCase();
+ document.getElementById("saleProducts").innerHTML=state.products.filter(p=>p.name.toLowerCase().includes(q)).map(p=>`<div class="product"><span class="emoji">${esc(p.emoji||"🧇")}</span><strong>${esc(p.name)}</strong><small>Disponible: ${p.stock}</small><span class="price">${money(p.price)}</span><button class="btn small" ${p.stock<=0?"disabled":""} onclick="addCart(${p.id})">Agregar</button></div>`).join("")||'<div class="empty">No se encontraron productos.</div>';
+}
+function addCart(id){const p=state.products.find(x=>x.id===id);if(!p)return;const line=cart.find(x=>x.id===id),qty=line?.qty||0;if(qty>=p.stock){alert("No hay stock suficiente.");return}if(line)line.qty++;else cart.push({id,qty:1});renderCart()}
+function changeQty(id,delta){const l=cart.find(x=>x.id===id),p=state.products.find(x=>x.id===id);if(!l)return;l.qty+=delta;if(l.qty<=0)cart=cart.filter(x=>x.id!==id);else if(l.qty>p.stock){l.qty=p.stock;alert("Stock máximo disponible.");}renderCart()}
+function cartTotal(){return cart.reduce((sum,l)=>{const p=state.products.find(x=>x.id===l.id);return sum+(p?p.price*l.qty:0)},0)}
+function renderCart(){const box=document.getElementById("cart");box.innerHTML=cart.length?cart.map(l=>{const p=state.products.find(x=>x.id===l.id);return p?`<div class="cartline"><div><b>${esc(p.name)}</b><br><small class="muted">${money(p.price)} c/u</small></div><div class="qty"><button onclick="changeQty(${p.id},-1)">−</button><b>${l.qty}</b><button onclick="changeQty(${p.id},1)">+</button></div><b>${money(p.price*l.qty)}</b></div>`:""}).join(""):'<div class="empty">Aún no hay productos en el pedido.</div>';document.getElementById("cartTotal").textContent=money(cartTotal())}
+document.getElementById("productSearch").addEventListener("input",renderSaleProducts);
+document.getElementById("clearCart").addEventListener("click",()=>{cart=[];renderCart()});
+document.getElementById("completeSale").addEventListener("click",()=>{
+ if(!cart.length){alert("Agrega al menos un producto.");return}
+ for(const l of cart){const p=state.products.find(x=>x.id===l.id);if(!p||p.stock<l.qty){alert("Stock insuficiente. Revisa el pedido.");return}}
+ const items=cart.map(l=>{const p=state.products.find(x=>x.id===l.id);return {id:p.id,name:p.name,price:p.price,qty:l.qty,subtotal:p.price*l.qty}});
+ items.forEach(i=>state.products.find(p=>p.id===i.id).stock-=i.qty);
+ const sale={code:"V-"+String(state.nextSale++).padStart(5,"0"),date:new Date().toISOString(),customer:document.getElementById("customer").value.trim()||"Público general",payment:document.getElementById("payment").value,items,total:items.reduce((a,i)=>a+i.subtotal,0)};
+ state.sales.push(sale);lastReceipt=sale;cart=[];document.getElementById("customer").value="";save();showReceipt(sale);
+});
+function showReceipt(s){document.getElementById("receiptContent").innerHTML=`<div style="max-width:360px;margin:20px auto;font-family:monospace"><center><h2>${esc(state.settings.name)}</h2><p>${esc(state.settings.address)}</p><b>COMPROBANTE INTERNO - NO ES BOLETA NI FACTURA</b><p>${esc(s.code)}<br>${fmtDate(s.date)}</p></center><p>Cliente: ${esc(s.customer)}<br>Pago: ${esc(s.payment)}</p><hr>${s.items.map(i=>`<p>${esc(i.name)} x${i.qty}<span style="float:right">${money(i.subtotal)}</span></p>`).join("")}<hr><h3 style="text-align:right">TOTAL: ${money(s.total)}</h3><center><p>¡Gracias por su compra!</p></center><button class="btn no-print" onclick="window.print()">Imprimir / Guardar PDF</button> <button class="btn light no-print" onclick="nav('sales')">Nueva venta</button></div>`;nav("receiptPrint")}
+function renderHistory(){const q=(document.getElementById("historySearch")?.value||"").toLowerCase();document.getElementById("historyRows").innerHTML=state.sales.slice().reverse().filter(s=>(s.code+" "+s.customer).toLowerCase().includes(q)).map(s=>`<tr><td>${esc(s.code)}<br><small>${fmtDate(s.date)}</small></td><td>${esc(s.customer)}</td><td>${s.items.map(i=>`${esc(i.name)} ×${i.qty}`).join("<br>")}</td><td>${esc(s.payment)}</td><td>${money(s.total)}</td><td class="no-print"><button class="btn small light" onclick="reprint('${s.code}')">Ver ticket</button></td></tr>`).join("")||'<tr><td colspan="6" class="empty">No hay ventas registradas.</td></tr>'}
+function reprint(code){const s=state.sales.find(x=>x.code===code);if(s)showReceipt(s)}
+document.getElementById("historySearch").addEventListener("input",renderHistory);
+function renderProducts(){document.getElementById("productRows").innerHTML=state.products.map(p=>`<tr><td>${esc(p.emoji||"🧇")} ${esc(p.name)}</td><td>${money(p.price)}</td><td>${p.stock}</td><td><span class="tag ${p.stock<=5?"low":""}">${p.stock<=5?"Stock bajo":"Disponible"}</span></td><td><button class="btn small light" onclick="editProduct(${p.id})">Editar</button> <button class="btn small danger" onclick="deleteProduct(${p.id})">Eliminar</button></td></tr>`).join("")||'<tr><td colspan="5">No hay productos.</td></tr>'}
+function editProduct(id){const p=state.products.find(x=>x.id===id);if(!p)return;const name=prompt("Nombre del producto:",p.name);if(name===null)return;if(!name.trim()){alert("El nombre no puede estar vacío.");return}const price=Number(prompt("Precio en soles:",p.price));if(!Number.isFinite(price)||price<0){alert("Precio inválido.");return}const stock=Number(prompt("Stock disponible:",p.stock));if(!Number.isInteger(stock)||stock<0){alert("Stock inválido.");return}p.name=name.trim();p.price=price;p.stock=stock;save()}
+function deleteProduct(id){if(state.sales.some(s=>s.items.some(i=>i.id===id))){if(!confirm("Este producto aparece en ventas anteriores. ¿Ocultarlo eliminándolo del catálogo? El historial conservará su nombre."))return}else if(!confirm("¿Eliminar este producto?"))return;state.products=state.products.filter(p=>p.id!==id);cart=cart.filter(x=>x.id!==id);save()}
+document.getElementById("newProduct").addEventListener("click",()=>{const name=prompt("Nombre del nuevo producto:");if(!name?.trim())return;const price=Number(prompt("Precio en soles:","8"));const stock=Number(prompt("Stock inicial:","20"));if(!Number.isFinite(price)||price<0||!Number.isInteger(stock)||stock<0){alert("Revisa el precio y el stock.");return}state.products.push({id:state.nextProduct++,name:name.trim(),price,stock,emoji:"🧇"});save()});
+function renderInventory(){document.getElementById("inventoryRows").innerHTML=state.products.map(p=>`<tr><td>${esc(p.name)}</td><td><b>${p.stock}</b></td><td><button class="btn small light" onclick="adjustStock(${p.id})">Actualizar</button></td><td><span class="tag ${p.stock<=5?"low":""}">${p.stock<=5?"Reponer":"Correcto"}</span></td></tr>`).join("")||'<tr><td colspan="4">No hay productos.</td></tr>'}
+function adjustStock(id){const p=state.products.find(x=>x.id===id);if(!p)return;const n=Number(prompt("Nuevo stock para "+p.name+":",p.stock));if(!Number.isInteger(n)||n<0){alert("Ingresa un número entero igual o mayor que cero.");return}p.stock=n;save()}
+function filteredSales(){const from=document.getElementById("fromDate").value,to=document.getElementById("toDate").value;return state.sales.filter(s=>{const d=dateKey(new Date(s.date));return(!from||d>=from)&&(!to||d<=to)})}
+function makeReport(){const arr=filteredSales(),sum=arr.reduce((a,s)=>a+s.total,0),units=arr.reduce((a,s)=>a+s.items.reduce((x,i)=>x+i.qty,0),0),groups={};arr.forEach(s=>{const d=dateKey(new Date(s.date));groups[d]??={count:0,total:0};groups[d].count++;groups[d].total+=s.total});document.getElementById("periodTotal").textContent=money(sum);document.getElementById("periodOrders").textContent=arr.length;document.getElementById("periodUnits").textContent=units;document.getElementById("periodAverage").textContent=money(arr.length?sum/arr.length:0);document.getElementById("reportRows").innerHTML=Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([d,x])=>`<tr><td>${d}</td><td>${x.count}</td><td>${money(x.total)}</td></tr>`).join("")||'<tr><td colspan="3" class="empty">Sin ventas en este periodo.</td></tr>'}
+document.getElementById("runReport").addEventListener("click",makeReport);
+document.getElementById("exportCsv").addEventListener("click",()=>{const rows=[["Codigo","Fecha","Cliente","Pago","Producto","Cantidad","Precio unitario","Subtotal","Total venta"]];filteredSales().forEach(s=>s.items.forEach(i=>rows.push([s.code,fmtDate(s.date),s.customer,s.payment,i.name,i.qty,i.price,i.subtotal,s.total])));const csv="\ufeff"+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(";")).join("\n");download("reporte_ventas.csv",csv,"text/csv;charset=utf-8")});
+function download(name,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+document.getElementById("backup").addEventListener("click",()=>download("respaldo_waffles_y_sabores_"+dateKey()+".json",JSON.stringify(state,null,2),"application/json"));
+document.getElementById("restoreFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data.products)||!Array.isArray(data.sales))throw Error();if(!confirm("Restaurar reemplazará los datos actuales. ¿Continuar?"))return;state=data;cart=[];save();alert("Copia restaurada correctamente.")}catch(err){alert("El archivo no es una copia válida de este sistema.")}e.target.value=""});
+document.getElementById("saveSettings").addEventListener("click",()=>{state.settings.name=document.getElementById("businessName").value.trim()||"WAFFLES Y SABORES S.A.C.";state.settings.address=document.getElementById("businessAddress").value.trim();save();alert("Datos guardados.")});
+document.getElementById("resetData").addEventListener("click",()=>{if(!confirm("Esto eliminará las ventas y cambios guardados en este navegador. Descarga primero una copia si necesitas conservarlos. ¿Continuar?"))return;state=loadFresh();cart=[];save();alert("Datos de demostración restablecidos.")});
+function loadFresh(){return {products:seedProducts.map(p=>({...p})),sales:[],settings:{name:"WAFFLES Y SABORES S.A.C.",address:"Íllimo, Lambayeque"},nextSale:1,nextProduct:6}}
+document.getElementById("today").textContent=new Date().toLocaleDateString("es-PE",{dateStyle:"medium"});
+const today=dateKey();document.getElementById("fromDate").value=today.slice(0,8)+"01";document.getElementById("toDate").value=today;
+renderAll();makeReport();
+</script>
+</body>
+</html>
